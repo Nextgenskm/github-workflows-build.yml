@@ -17,8 +17,12 @@ jobs:
           gradle-version: 8.9
       - name: Compilar
         run: |
-          SETTINGS=$(find . -name settings.gradle.kts -not -path './.git/*' | head -n 1)
-          echo "Proyecto encontrado en: $SETTINGS"
+          ZIP=$(find . -iname '*.zip' -not -path './.git/*' | head -n 1)
+          if [ -z "$ZIP" ]; then echo "No hay ningun ZIP en el repositorio"; exit 1; fi
+          echo "Usando: $ZIP"
+          mkdir -p /tmp/proj
+          unzip -o "$ZIP" -d /tmp/proj
+          SETTINGS=$(find /tmp/proj -name settings.gradle.kts | head -n 1)
           cd "$(dirname "$SETTINGS")"
           gradle assembleDebug
           mkdir -p "$GITHUB_WORKSPACE/out"
