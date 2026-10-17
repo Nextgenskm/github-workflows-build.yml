@@ -15,8 +15,15 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.9
-      - run: gradle assembleDebug
+      - name: Compilar
+        run: |
+          SETTINGS=$(find . -name settings.gradle.kts -not -path './.git/*' | head -n 1)
+          echo "Proyecto encontrado en: $SETTINGS"
+          cd "$(dirname "$SETTINGS")"
+          gradle assembleDebug
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/out/"
       - uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: out/app-debug.apk
